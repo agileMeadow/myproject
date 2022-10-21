@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardns">
+	
+	<!-- New post -->
+	<insert id="insert" parameterType="board"> 	<!-- board: Alias of Configuration.xml -->
+		insert into myboard values(myboard_seq.nextval,#{writer},
+		#{passwd}, #{subject}, #{content},0, sysdate)
+	</insert>
+	
+	<!-- Total post count -->
+	<select id="count" resultType="int">
+		select count(*) from myboard
+	</select>
+	
+	<!--  Post list -->
+	<select id="list" parameterType="int" resultType="board">
+		<![CDATA[
+		select * from (select rownum rnum, board.* from (
+		select * from myboard order by no desc) board )
+		where rnum >= ((#{page}-1) * 10 + 1) and rnum <= (#{page} * 10)
+		]]>
+	</select>
+	
+	<!-- view count + 1 -->
+	<update id="hit" parameterType="int">
+		update myboard set readcount=readcount+1 where no=#{no}
+	</update>
+	
+	<!-- Post detail -->
+	<select id="content" parameterType="int" resultType="board">
+		select * from myboard where no = #{no}
+	</select>
+	
+	<!-- Update -->
+	<update id="update" parameterType="board">
+		update myboard set writer=#{writer}, subject=#{subject}, 
+		content=#{content}, register=sysdate where no=#{no}
+	</update>
+	
+	<!-- Delete -->
+	<delete id="delete" parameterType="int">
+		delete from myboard where no = #{no}
+	</delete>
+	
+</mapper>
